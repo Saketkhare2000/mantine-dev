@@ -1,0 +1,36 @@
+:root {
+  --text-black: #000;
+  --primary: #6435c7;
+}
+.heading {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 40px;
+  color: #000000;
+}
+.sub-heading {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.17em;
+  color: #85858c;
+}
+.body {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 32px;
+  /* or 180% */
+  text-align: justify;
+  color: #000000;
+}
+.title {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.17em;
+  color: #85858c;
+}

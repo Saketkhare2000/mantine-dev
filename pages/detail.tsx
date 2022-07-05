@@ -1,5 +1,5 @@
 import { Tabs } from '@mantine/core';
-import React from 'react';
+import React, { useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import ArtDetail from '../components/ArtDetail';
 import Ownership from '../components/Ownership/index';
@@ -17,6 +17,7 @@ const pageStyle = {
 };
 
 const Detail = () => {
+  const [loggedIn, setLoggedIn] = useState();
   return (
     <div style={pageStyle}>
       <Carousel width={'500px'} emulateTouch={true} infiniteLoop={true}>
@@ -40,6 +41,7 @@ const Detail = () => {
         </Tabs.Tab>
         <Tabs.Tab label="Ownership Status">
           <Ownership />
+          {!loggedIn && <h1 className="header">Not Logged In</h1>}
         </Tabs.Tab>
       </Tabs>
     </div>

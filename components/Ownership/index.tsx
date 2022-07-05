@@ -9,16 +9,22 @@ import {
   List,
   Text,
   ActionIcon,
+  Divider,
+  Checkbox,
+  Select,
 } from '@mantine/core';
 import { ChevronDownIcon, MinusIcon, PlusIcon } from '@modulz/radix-icons';
 import React, { useRef, useState } from 'react';
-import { SiBuymeacoffee } from 'react-icons/si';
-import { MdOutlinePolymer } from 'react-icons/md';
+import { SiBuymeacoffee, SiEthereum } from 'react-icons/si';
+import { MdOutlinePolymer, MdPolymer } from 'react-icons/md';
 import styles from './style.module.css';
 
 const Ownership = () => {
-  const amountRef = useRef();
+  const amountRef = useRef<HTMLInputElement>(null);
   const [inputVal, setInputVal] = useState(1);
+  const [value, setValue] = useState('');
+  const [checked, setChecked] = useState(false);
+
   return (
     <>
       <Group>
@@ -28,13 +34,7 @@ const Ownership = () => {
         <h1 className="heading">Order Summary</h1>
       </Group>
       <Group direction="column">
-        <Accordion
-          mt={'md'}
-          initialState={true}
-          state={true}
-          className={styles.accordion}
-          iconPosition="right"
-        >
+        <Accordion mt={'md'} className={styles.accordion} iconPosition="right">
           <Accordion.Item className={styles.accordianLabel} label="Important Points">
             <List type="ordered">
               <List.Item>Mint up to 50 ArtFi NFTs at a time.</List.Item>
@@ -59,16 +59,30 @@ const Ownership = () => {
         </Group>
         <Group direction="row">
           <InputWrapper id="Price" size="md" label="PRICE (PER ARTFI NFT)">
-            <Input component="select" size="md">
-              <option value="Matic">Matic</option>
-              <option value="Ethereum">Eth</option>
-            </Input>
+            <Select
+              label=""
+              required
+              searchable
+              value={value}
+              onChange={() => setValue}
+              placeholder="Choose your chain"
+              data={[
+                { value: 'Ethereum', label: 'Ethereum' },
+                { value: 'W ETH', label: 'W ETH' },
+                { value: 'Matic', label: 'Matic' },
+              ]}
+            />
           </InputWrapper>
           <InputWrapper id="Price" size="md" label="Price">
-            <Input component="select" size="md">
-              <option value="Matic">12 Matic</option>
-              <option value="Ethereum">23 Eth</option>
-            </Input>
+            <Select
+              label=""
+              icon={<MdPolymer />}
+              placeholder="Price"
+              data={[
+                { value: '12 Matic', label: '12 Matic' },
+                { value: '25 Eth', label: '25 Eth' },
+              ]}
+            />
           </InputWrapper>
           =
         </Group>
@@ -78,16 +92,16 @@ const Ownership = () => {
               <Input
                 value={inputVal}
                 ref={amountRef}
-                style={{ flexGrow: '1' }}
+                style={{ flexGrow: 1 }}
                 size="md"
                 id="input-demo"
                 placeholder="Number of NFTs"
                 invalid={inputVal < 0 ? true : false}
-                error="Your credit card expired"
               />
               <ActionIcon
                 onClick={() => setInputVal(inputVal - 1)}
                 size={'xl'}
+                radius={'md'}
                 color={'gray'}
                 variant="outline"
               >
@@ -96,6 +110,7 @@ const Ownership = () => {
               <ActionIcon
                 onClick={() => setInputVal(inputVal + 1)}
                 size={'xl'}
+                radius={'md'}
                 color={'gray'}
                 variant="outline"
               >
@@ -104,6 +119,25 @@ const Ownership = () => {
             </Group>
           </InputWrapper>
         </Group>
+        <Group mt={'md'} position="apart" style={{ width: '50%', alignItems: 'flex-start' }}>
+          <Text className={styles.priceTotal}>TOTAL</Text>
+          <Group direction="column">
+            <Text className="body">Matic 12.35</Text>
+            <Text className="body">$1500</Text>
+          </Group>
+        </Group>
+      </Group>
+      <Divider my="sm" />
+      <Group>
+        <Checkbox
+          checked={checked}
+          onChange={(event) => setChecked(event.currentTarget.checked)}
+          label="I have read and confirmed the Terms of Sale"
+          color="grape"
+        />
+        <Button color={'grape'} disabled={checked ? false : true}>
+          Buy with {value}
+        </Button>
       </Group>
     </>
   );

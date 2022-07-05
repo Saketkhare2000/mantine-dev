@@ -1,10 +1,9 @@
-import { Group, Image, MantineProvider, Tabs } from '@mantine/core';
+import { Tabs } from '@mantine/core';
 import React from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import ArtDetail from '../components/ArtDetail';
-import Ownership from '../components/Ownership';
+import Ownership from '../components/Ownership/index';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import ReactPlayer from 'react-player';
 
 const pageStyle = {
   maxWidth: '1350px',

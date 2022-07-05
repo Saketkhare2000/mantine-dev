@@ -12,3 +12,11 @@
 .inputGroup {
   width: 100%;
 }
+.priceTotal {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.17em;
+  color: var(--primary);
+}

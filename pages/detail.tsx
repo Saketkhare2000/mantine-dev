@@ -1,9 +1,14 @@
 import { Tabs } from '@mantine/core';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import ArtDetail from '../components/ArtDetail';
 import Ownership from '../components/Ownership/index';
+import { ethers } from "ethers";
+
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { web3Modal } from '../lib/Web3Modal';
+import { web3Context } from '../context';
+import { FormDataInterface } from '../types';
 
 const pageStyle = {
   maxWidth: '1350px',
@@ -17,7 +22,80 @@ const pageStyle = {
 };
 
 const Detail = () => {
-  const [loggedIn, setLoggedIn] = useState();
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormDataInterface>({
+    address: undefined,
+    contactSigned: false,
+    ammount: 1,
+    email: undefined,
+    chain: 'Matic'
+  });
+
+  const { web3Data, setWeb3Data } = useContext(web3Context)
+
+  const connectWallet = async () => {
+    const instance = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(instance);
+    const signer = provider.getSigner();
+
+    setWeb3Data({ provider: provider, signer: signer })
+    setLoggedIn(true)
+  }
+
+  const disconnectWallet = () => {
+    setWeb3Data(null)
+    setLoggedIn(false)
+
+
+    web3Modal.clearCachedProvider();
+  }
+
+  const getData = async () => {
+    console.log(web3Data)
+
+    console.log(await web3Data?.signer.getAddress())
+    console.log(await web3Data?.signer.getGasPrice())
+    console.log(await web3Data?.signer.getBalance())
+    console.log(await web3Data?.signer.getChainId())
+
+    console.log(await web3Data?.provider.getGasPrice())
+    console.log(await web3Data?.provider.listAccounts())
+    // console.log(await provider.getAvatar(await signer.getAddress()))
+
+    web3Data?.signer.getAddress().then((res) => {
+      setFormData({ ...formData, address: res })
+    })
+  }
+
+
+  useEffect(() => {
+    if (web3Data?.provider?.on) {
+      getData()
+
+      // Subscribe to accounts change
+      web3Data.provider.on("accountsChanged", (accounts: string[]) => {
+        console.log(accounts);
+      });
+
+      // Subscribe to chainId change
+      web3Data.provider.on("chainChanged", (chainId: number) => {
+        console.log(chainId);
+      });
+
+      // Subscribe to provider connection
+      web3Data.provider.on("connect", (info: { chainId: number }) => {
+        console.log(info);
+      });
+
+      // Subscribe to provider disconnection
+      web3Data.provider.on("disconnect", (error: { code: number; message: string }) => {
+        console.log(error);
+      });
+    }
+  }, [web3Data])
+
+
+
   return (
     <div style={pageStyle}>
       <Carousel width={'500px'} emulateTouch={true} infiniteLoop={true}>
@@ -40,8 +118,21 @@ const Detail = () => {
           <ArtDetail />
         </Tabs.Tab>
         <Tabs.Tab label="Ownership Status">
-          <Ownership />
-          {!loggedIn && <h1 className="header">Not Logged In</h1>}
+          {
+            loggedIn
+              ? (
+                <div>
+                  <button onClick={disconnectWallet}>Disconnect Wallet</button>
+                  <button onClick={getData}>Get Data</button>
+                  <Ownership formData={formData} setFormData={setFormData} />
+                </div>
+              )
+              : (
+                <div>
+                  <button onClick={connectWallet}>Connect Wallet</button>
+                </div>
+              )
+          }
         </Tabs.Tab>
       </Tabs>
     </div>

@@ -13,17 +13,18 @@ import {
   Checkbox,
   Select,
 } from '@mantine/core';
-import { ChevronDownIcon, MinusIcon, PlusIcon } from '@modulz/radix-icons';
-import React, { useRef, useState } from 'react';
+import { MinusIcon, PlusIcon } from '@modulz/radix-icons';
+import React, { useContext, useRef } from 'react';
 import { SiBuymeacoffee, SiEthereum } from 'react-icons/si';
 import { MdOutlinePolymer, MdPolymer } from 'react-icons/md';
 import styles from './style.module.css';
+import { web3Context } from '../../context';
+import { FormDataInterface } from '../../types';
 
-const Ownership = () => {
+const Ownership = ({ formData, setFormData }: { formData: FormDataInterface; setFormData: (data: FormDataInterface) => void }) => {
   const amountRef = useRef<HTMLInputElement>(null);
-  const [inputVal, setInputVal] = useState(1);
-  const [value, setValue] = useState('');
-  const [checked, setChecked] = useState(false);
+  const { web3Data } = useContext(web3Context)
+
 
   return (
     <>
@@ -44,17 +45,19 @@ const Ownership = () => {
               </List.Item>
               <List.Item>
                 You may experience issues minting with WETH.e. If the error persists, please swap
-                WETH.e to MATIC here.
+                WETH to MATIC here.
               </List.Item>
             </List>
           </Accordion.Item>
         </Accordion>
         <Group mt={'md'} direction="column" grow className={styles.inputGroup}>
           <InputWrapper id="wallet-add" size="sm" label="METAMASK WALLET">
-            <Input radius={'md'} size={'md'} id="wallet-add" placeholder="0x16c0...3223" />
+            <Input radius={'md'} size={'md'} id="wallet-add" disabled value={formData.address} placeholder="0x16c0...3223" />
           </InputWrapper>
           <InputWrapper id="email" size="sm" label="EMAIL ADDRESS">
-            <Input radius={'md'} type={'email'} size={'md'} id="email" placeholder="Your email" />
+            <Input radius={'md'} type={'email'} size={'md'} id="email" placeholder="Your email"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setFormData({ ...formData, email: e.target.value }) }}
+              value={formData.email} />
           </InputWrapper>
         </Group>
         <Group direction="row">
@@ -63,8 +66,8 @@ const Ownership = () => {
               label=""
               required
               searchable
-              value={value}
-              onChange={() => setValue}
+              value={formData.chain}
+              onChange={(res) => { if (res) setFormData({ ...formData, chain: res }) }}
               placeholder="Choose your chain"
               data={[
                 { value: 'Ethereum', label: 'Ethereum' },
@@ -90,16 +93,16 @@ const Ownership = () => {
           <InputWrapper size="md" id="input-demo" label="Amount">
             <Group>
               <Input
-                value={inputVal}
+                value={formData.ammount}
                 ref={amountRef}
                 style={{ flexGrow: 1 }}
                 size="md"
                 id="input-demo"
                 placeholder="Number of NFTs"
-                invalid={inputVal < 0 ? true : false}
+                invalid={formData.ammount < 0 ? true : false}
               />
               <ActionIcon
-                onClick={() => setInputVal(inputVal - 1)}
+                onClick={() => setFormData({ ...formData, ammount: formData.ammount - 1 })}
                 size={'xl'}
                 radius={'md'}
                 color={'gray'}
@@ -108,7 +111,7 @@ const Ownership = () => {
                 <MinusIcon />
               </ActionIcon>
               <ActionIcon
-                onClick={() => setInputVal(inputVal + 1)}
+                onClick={() => setFormData({ ...formData, ammount: formData.ammount + 1 })}
                 size={'xl'}
                 radius={'md'}
                 color={'gray'}
@@ -130,13 +133,25 @@ const Ownership = () => {
       <Divider my="sm" />
       <Group>
         <Checkbox
-          checked={checked}
-          onChange={(event) => setChecked(event.currentTarget.checked)}
+          checked={formData.contactSigned}
+          onChange={() => {
+            if (!formData.contactSigned) {
+              web3Data?.signer.signMessage("I have read and confirmed the Terms of Sale.").then((res: string) => {
+                setFormData({ ...formData, contactSigned: true })
+                console.log(res)
+              }).catch((err) => {
+                setFormData({ ...formData, contactSigned: false })
+                console.log(err);
+              })
+            } else {
+              setFormData({ ...formData, contactSigned: false })
+            }
+          }}
           label="I have read and confirmed the Terms of Sale"
           color="grape"
         />
-        <Button color={'grape'} disabled={checked ? false : true}>
-          Buy with {value}
+        <Button color={'grape'} disabled={formData.contactSigned ? false : true}>
+          Buy with {formData.chain}
         </Button>
       </Group>
     </>

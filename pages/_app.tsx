@@ -7,9 +7,12 @@ import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core
 import { NotificationsProvider } from '@mantine/notifications';
 import '../styles/detail.scss';
 import '../styles/global.scss';
+import { web3Context } from '../context';
+import { Web3DataInterface } from '../context/types';
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
   const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
+  const [web3Data, setWeb3Data] = useState<Web3DataInterface>(null)
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme = value || (colorScheme === 'dark' ? 'light' : 'dark');
@@ -31,13 +34,15 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         />
       </Head>
 
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
-          <NotificationsProvider>
-            <Component {...pageProps} />
-          </NotificationsProvider>
-        </MantineProvider>
-      </ColorSchemeProvider>
+      <web3Context.Provider value={{ web3Data, setWeb3Data }}>
+        <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+          <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+            <NotificationsProvider>
+              <Component {...pageProps} />
+            </NotificationsProvider>
+          </MantineProvider>
+        </ColorSchemeProvider>
+      </web3Context.Provider>
     </>
   );
 }
